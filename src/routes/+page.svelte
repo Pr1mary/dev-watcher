@@ -1,2 +1,13 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<script lang="ts">
+    import { Card, Form } from '@sveltestrap/sveltestrap';
+
+    let data = ["test1", "test2", "test3"];
+</script>
+
+{#each data as item}
+<Card body class="m-3 shadow">
+    <p>
+        This is content test {item}
+    </p>
+</Card>
+{/each}
