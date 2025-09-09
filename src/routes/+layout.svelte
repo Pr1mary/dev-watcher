@@ -1,14 +1,17 @@
 <script lang="ts">
 	import favicon from '$lib/assets/favicon.svg';
-    import { Button, Navbar } from '@sveltestrap/sveltestrap';
+    import { Button, Modal, ModalBody, ModalHeader, Navbar } from '@sveltestrap/sveltestrap';
 	import { onMount } from 'svelte';
-	import { authSessionEvent, logout } from '../helper/firebase_helper';
+	import { authSessionEvent, login, logout } from '../helper/firebase_helper';
+	import { goto } from '$app/navigation';
 
 	let { children } = $props();
-
+	
+    let inputEmail = $state();
+    let inputPassword = $state();
 	const userDataKey = "userData";
 	const userData = sessionStorage.getItem(userDataKey);
-	let showLogout = $state((userData)?true:false);
+	let isLogin = $state((userData)?true:false);
 
 	onMount(() => {
 		authSessionEvent(sessionStorage, userDataKey);
@@ -16,8 +19,36 @@
 
 	const logoutProcess = () => {
 		logout();
-		showLogout = false;
+		isLogin = false;
 	}
+
+    const processLogin = async (email: unknown, password: unknown) => {
+        
+        try {
+            if (typeof email !== 'string' || typeof password !== 'string'){
+                throw "Neither email nor password is string"
+            }
+
+            const userData = await login(email, password);
+            if (userData != null) {
+                console.log("User succesfully signed in!");
+                isLogin = true;
+				email = "";
+				password = "";
+            } else {
+                alert("Email or Password might be wrong!");
+            }
+
+        } catch (error) {
+            alert("Login error, please contact administrator!");
+            if (error instanceof Error){
+                console.log("Error when logging in: ", error.message);
+            } else {
+                console.log("Unknown error when logging in");
+            }
+        }
+
+    }
 </script>
 
 <svelte:head>
@@ -27,15 +58,33 @@
 </svelte:head>
 
 <Navbar sticky=true class="mb-4 shadow" color="light" light expand="md">
-	<div class="container">
-		<h1>Project Uptime</h1>
-	</div>
 
-	{#if showLogout}
+	<div class="container d-flex justify-content-between">
+		<h4>Project Uptime</h4>
+		{#if isLogin}
 		<Button onclick={() => logoutProcess()}>
 			Logout	
 		</Button>
-	{/if}
+		{/if}
+	</div>
+	
 </Navbar>
+
+<Modal isOpen={!isLogin} backdrop="static" class="modal-dialog-centered">
+	<ModalHeader>
+		<h2>User Login</h2>
+	</ModalHeader>
+	<ModalBody>
+		<div class="mb-3">
+			<label for="input-email" class="form-label">Email address</label>
+			<input bind:value={inputEmail} type="email" class="form-control" id="input-email" aria-describedby="emailHelp">
+		</div>
+		<div class="mb-3">
+			<label for="input-password" class="form-label">Password</label>
+			<input bind:value={inputPassword} type="password" class="form-control" id="input-password">
+		</div>
+		<button class="btn btn-primary" onclick="{async () => processLogin(inputEmail, inputPassword)}">Submit</button>
+	</ModalBody>
+</Modal>
 
 {@render children?.()}
