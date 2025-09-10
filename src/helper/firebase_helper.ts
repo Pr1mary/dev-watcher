@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
-// import { collection, doc, getFirestore } from "firebase/firestore/lite";
+import { collection, getDocs, getFirestore } from "firebase/firestore/lite";
 
 const firebase_config = {
   apiKey: "AIzaSyAjxfOaGElAlZDhoD8j9Y1TK5L60PjqjRU",
@@ -13,6 +13,7 @@ const firebase_config = {
 
 const app = initializeApp(firebase_config);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 const login = async (email: string, password: string) => {
     let user = null;
@@ -67,10 +68,19 @@ const authSessionEvent = (storage: Storage, storageKey: string) => {
     )
 }
 
+const fetchData = async (collectionName: string) => {
+    const result: object[]= []
+    const queryData = await getDocs(collection(db, collectionName));
+    queryData.forEach(doc => {
+        result.push(doc.data())
+    });
+    return result;
+}
 
 export {
     login,
     logout,
-    authSessionEvent
+    authSessionEvent,
+    fetchData
 }
 

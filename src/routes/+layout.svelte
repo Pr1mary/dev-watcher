@@ -1,9 +1,9 @@
 <script lang="ts">
 	import favicon from '$lib/assets/favicon.svg';
-    import { Button, Modal, ModalBody, ModalHeader, Navbar } from '@sveltestrap/sveltestrap';
+    import { Button, Container, Modal, ModalBody, ModalHeader, Navbar } from '@sveltestrap/sveltestrap';
 	import { onMount } from 'svelte';
 	import { authSessionEvent, login, logout } from '../helper/firebase_helper';
-	import { goto } from '$app/navigation';
+	import { pageStatus } from "../helper/shared_state.svelte";
 
 	let { children } = $props();
 	
@@ -11,7 +11,7 @@
     let inputPassword = $state();
 	const userDataKey = "userData";
 	const userData = sessionStorage.getItem(userDataKey);
-	let isLogin = $state((userData)?true:false);
+	pageStatus.isLogin = (userData)?true:false;
 
 	onMount(() => {
 		authSessionEvent(sessionStorage, userDataKey);
@@ -19,7 +19,9 @@
 
 	const logoutProcess = () => {
 		logout();
-		isLogin = false;
+		inputEmail = "";
+		inputPassword = "";
+		pageStatus.isLogin = false;
 	}
 
     const processLogin = async (email: unknown, password: unknown) => {
@@ -32,7 +34,7 @@
             const userData = await login(email, password);
             if (userData != null) {
                 console.log("User succesfully signed in!");
-                isLogin = true;
+                pageStatus.isLogin = true;
 				email = "";
 				password = "";
             } else {
@@ -49,6 +51,8 @@
         }
 
     }
+
+	
 </script>
 
 <svelte:head>
@@ -57,20 +61,18 @@
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </svelte:head>
 
-<Navbar sticky=true class="mb-4 shadow" color="light" light expand="md">
-
-	<div class="container d-flex justify-content-between">
-		<h4>Project Uptime</h4>
-		{#if isLogin}
+<Navbar sticky=true class="mb-4 shadow" expand="md">
+	<Container class="d-flex justify-content-between">
+		<h2>Project Uptime</h2>
+		{#if pageStatus.isLogin}
 		<Button onclick={() => logoutProcess()}>
 			Logout	
 		</Button>
 		{/if}
-	</div>
-	
+	</Container>	
 </Navbar>
 
-<Modal isOpen={!isLogin} backdrop="static" class="modal-dialog-centered">
+<Modal isOpen={!pageStatus.isLogin} backdrop="static" class="modal-dialog-centered">
 	<ModalHeader>
 		<h2>User Login</h2>
 	</ModalHeader>
