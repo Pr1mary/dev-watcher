@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Badge, Card, CardBody, CardTitle, Container } from '@sveltestrap/sveltestrap';
     import { fetchData, Timestamp } from "../helper/firebase_helper";
-	import { pageStatus } from '../helper/shared_state.svelte';
+	import { pageStatus } from '../helper/shared_state_helper.svelte';
 
     interface RawDeviceData {
         group_id: string

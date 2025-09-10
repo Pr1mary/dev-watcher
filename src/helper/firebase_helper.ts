@@ -1,15 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { collection, getDocs, getFirestore, Timestamp } from "firebase/firestore/lite";
-
-const firebase_config = {
-  apiKey: "AIzaSyAjxfOaGElAlZDhoD8j9Y1TK5L60PjqjRU",
-  authDomain: "homelab-mraflis.firebaseapp.com",
-  projectId: "homelab-mraflis",
-  storageBucket: "homelab-mraflis.firebasestorage.app",
-  messagingSenderId: "858563340378",
-  appId: "1:858563340378:web:f84de1118943f9915a9063"
-};
+import firebase_config from "./firebase_config.json";
 
 const app = initializeApp(firebase_config);
 const auth = getAuth(app);

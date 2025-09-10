@@ -3,7 +3,7 @@
     import { Button, Container, Modal, ModalBody, ModalHeader, Navbar } from '@sveltestrap/sveltestrap';
 	import { onMount } from 'svelte';
 	import { authSessionEvent, login, logout } from '../helper/firebase_helper';
-	import { pageStatus } from "../helper/shared_state.svelte";
+	import { pageStatus } from "../helper/shared_state_helper.svelte";
 
 	let { children } = $props();
 	
@@ -61,7 +61,7 @@
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </svelte:head>
 
-<Navbar sticky=true class="mb-4 shadow" expand="md">
+<Navbar class="mb-4 shadow" expand="md">
 	<Container class="d-flex justify-content-between">
 		<h2>Project Uptime</h2>
 		{#if pageStatus.isLogin}
