@@ -25,5 +25,7 @@ Thumbs.db
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
-# firebase config json
+# firebase config
+.firebaserc
+firebase.json
 firebase_config.json

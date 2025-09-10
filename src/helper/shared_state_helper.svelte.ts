@@ -1,6 +1,3 @@
+const pageStatus = $state({ isLogin: false });
 
-const pageStatus = $state({isLogin:false});
-
-export {
-    pageStatus
-}
+export { pageStatus };
