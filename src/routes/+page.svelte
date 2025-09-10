@@ -1,5 +1,12 @@
 <script lang="ts">
-	import { Badge, Card, CardBody, CardTitle, Container } from '@sveltestrap/sveltestrap';
+	import {
+		Badge,
+		Card,
+		CardBody,
+		CardFooter,
+		CardTitle,
+		Container
+	} from '@sveltestrap/sveltestrap';
 	import { fetchData, Timestamp } from '../helper/firebase_helper';
 	import { pageStatus } from '../helper/shared_state_helper.svelte';
 
@@ -10,6 +17,7 @@
 		machine_id: string;
 		local_ip: string;
 		public_ip: string;
+		os_type: string;
 	}
 
 	interface DeviceData {
@@ -17,6 +25,8 @@
 		machineName: string;
 		publicIp: string;
 		localIp: string;
+		lastUpdate: Date;
+		osType: string;
 		expired: boolean;
 	}
 
@@ -38,8 +48,10 @@
 							displayName:
 								machineName.length > 10 ? machineName.substring(0, 10) + '...' : machineName,
 							machineName: machineName,
-							localIp: (data as RawDeviceData).local_ip,
-							publicIp: (data as RawDeviceData).public_ip,
+							localIp: (data as RawDeviceData).local_ip || '-',
+							publicIp: (data as RawDeviceData).public_ip || '-',
+							lastUpdate: (data as RawDeviceData).last_update.toDate(),
+							osType: (data as RawDeviceData).os_type || 'Unknown',
 							expired: isExpired
 						};
 						deviceList.push(formattedData);
@@ -63,7 +75,7 @@
 		<Card body class="m-3 shadow">
 			<CardTitle>
 				<div class="d-flex justify-content-between">
-					<div>{data.displayName}</div>
+					<div><strong>{data.displayName}</strong></div>
 					<div>
 						{#if data.expired}
 							<Badge class="text-bg-danger">offline</Badge>
@@ -75,9 +87,13 @@
 			</CardTitle>
 			<CardBody>
 				Machine ID: <strong>{data.machineName}</strong><br />
+				OS Type: <strong>{data.osType}</strong><br />
 				Public IP: <strong>{data.publicIp}</strong><br />
 				Local IP: <strong>{data.localIp}</strong>
 			</CardBody>
+			<CardFooter>
+				<small>Last Update: {data.lastUpdate}</small>
+			</CardFooter>
 		</Card>
 	{/each}
 </Container>
