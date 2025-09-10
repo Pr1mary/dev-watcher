@@ -26,6 +26,7 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 # firebase config
+.firebase/
 .firebaserc
 firebase.json
 firebase_config.json
