@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { collection, getDocs, getFirestore } from "firebase/firestore/lite";
+import { collection, getDocs, getFirestore, Timestamp } from "firebase/firestore/lite";
 
 const firebase_config = {
   apiKey: "AIzaSyAjxfOaGElAlZDhoD8j9Y1TK5L60PjqjRU",
@@ -81,6 +81,8 @@ export {
     login,
     logout,
     authSessionEvent,
-    fetchData
+    fetchData,
+    
+    Timestamp
 }
 
