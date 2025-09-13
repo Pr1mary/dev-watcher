@@ -38,25 +38,31 @@ const logout = async () => {
 };
 
 const authSessionEvent = (storage: Storage, storageKey: string) => {
-	onAuthStateChanged(
-		auth,
-		(user) => {
-			if (user != null) {
-				const userData = {
-					id: user.uid,
-					name: user.displayName,
-					anonymous: user.isAnonymous
-				};
-				storage.setItem(storageKey, JSON.stringify(userData));
-			} else {
+	
+	return new Promise((resolve, reject) => {
+		onAuthStateChanged(
+			auth,
+			(user) => {
+				if (user != null) {
+					const userData = {
+						id: user.uid,
+						name: user.displayName,
+						anonymous: user.isAnonymous
+					};
+					storage.setItem(storageKey, JSON.stringify(userData));
+					resolve(true);
+				} else {
+					storage.removeItem(storageKey);
+					resolve(false);
+				}
+			},
+			(error) => {
 				storage.removeItem(storageKey);
+				console.log('error when change user state: ', error.message);
+				reject(false);
 			}
-		},
-		(error) => {
-			storage.removeItem(storageKey);
-			console.log('error when change user state: ', error.message);
-		}
-	);
+		);
+	});
 };
 
 const fetchData = async (collectionName: string) => {

@@ -16,12 +16,20 @@
 
 	let inputEmail = $state();
 	let inputPassword = $state();
+	let authCheckDone = $state(false);
+
 	const userDataKey = 'userData';
 	const userData = sessionStorage.getItem(userDataKey);
-	pageStatus.isLogin = userData ? true : false;
+	
+	pageStatus.isLogin = false;
 
-	onMount(() => {
-		authSessionEvent(sessionStorage, userDataKey);
+	onMount(async () => {
+		try {
+			pageStatus.isLogin = (await authSessionEvent(sessionStorage, userDataKey)) as boolean
+		} catch (err) {
+			pageStatus.isLogin = false;
+		}
+		authCheckDone = true;
 	});
 
 	const logoutProcess = () => {
@@ -72,35 +80,38 @@
 <Navbar class="mb-4 shadow sticky-top" color="light" expand="md">
 	<Container class="d-flex justify-content-between">
 		<h2>Project Uptime</h2>
-		{#if pageStatus.isLogin}
+		{#if authCheckDone && pageStatus.isLogin}
 			<Button onclick={() => logoutProcess()}>Logout</Button>
 		{/if}
 	</Container>
 </Navbar>
 
-<Modal isOpen={!pageStatus.isLogin} backdrop="static" class="modal-dialog-centered">
-	<ModalHeader>
-		<h2>User Login</h2>
-	</ModalHeader>
-	<ModalBody>
-		<div class="mb-3">
-			<label for="input-email" class="form-label">Email address</label>
-			<input
-				bind:value={inputEmail}
-				type="email"
-				class="form-control"
-				id="input-email"
-				aria-describedby="emailHelp"
-			/>
-		</div>
-		<div class="mb-3">
-			<label for="input-password" class="form-label">Password</label>
-			<input bind:value={inputPassword} type="password" class="form-control" id="input-password" />
-		</div>
-		<button class="btn btn-primary" onclick={async () => processLogin(inputEmail, inputPassword)}
-			>Submit</button
-		>
-	</ModalBody>
-</Modal>
+<!-- authCheckDone make the modal to not render until the firebase auth process done -->
+{#if authCheckDone}
+	<Modal isOpen={!pageStatus.isLogin} backdrop="static" class="modal-dialog-centered">
+		<ModalHeader>
+			<h2>User Login</h2>
+		</ModalHeader>
+		<ModalBody>
+			<div class="mb-3">
+				<label for="input-email" class="form-label">Email address</label>
+				<input
+					bind:value={inputEmail}
+					type="email"
+					class="form-control"
+					id="input-email"
+					aria-describedby="emailHelp"
+				/>
+			</div>
+			<div class="mb-3">
+				<label for="input-password" class="form-label">Password</label>
+				<input bind:value={inputPassword} type="password" class="form-control" id="input-password" />
+			</div>
+			<button class="btn btn-primary" onclick={async () => processLogin(inputEmail, inputPassword)}
+				>Submit</button
+			>
+		</ModalBody>
+	</Modal>
+{/if}
 
 {@render children?.()}
