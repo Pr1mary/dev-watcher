@@ -18,14 +18,11 @@
 	let inputPassword = $state();
 	let authCheckDone = $state(false);
 
-	const userDataKey = 'userData';
-	const userData = sessionStorage.getItem(userDataKey);
-	
 	pageStatus.isLogin = false;
 
 	onMount(async () => {
 		try {
-			pageStatus.isLogin = (await authSessionEvent(sessionStorage, userDataKey)) as boolean
+			pageStatus.isLogin = (await authSessionEvent(sessionStorage, 'userData')) as boolean
 		} catch (err) {
 			pageStatus.isLogin = false;
 		}
