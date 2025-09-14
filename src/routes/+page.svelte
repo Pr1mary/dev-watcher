@@ -9,6 +9,7 @@
 	} from '@sveltestrap/sveltestrap';
 	import { fetchData, Timestamp } from '../helper/firebase_helper';
 	import { pageStatus } from '../helper/shared_state_helper.svelte';
+	import { Chart } from 'chart.js';
 
 	interface RawDeviceData {
 		group_id: string;
@@ -71,6 +72,24 @@
 </script>
 
 <Container>
+	<Card body class="m-3">
+		<CardTitle>
+			<div class="d-flex justify-content-between">
+				<div>uptime status:</div>
+			</div>
+		</CardTitle>
+		<CardBody>
+			
+		</CardBody>
+		<!-- <CardFooter>
+			<small>Last Update: {data.lastUpdate}</small>
+		</CardFooter> -->
+	</Card>
+
+	<div class="d-flex justify-content-between">
+		<div>Device List:</div>
+	</div>
+
 	{#each deviceList as data}
 		<Card body class="m-3 shadow">
 			<CardTitle>
