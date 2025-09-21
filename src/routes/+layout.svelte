@@ -19,6 +19,7 @@
 	let authCheckDone = $state(false);
 
 	pageStatus.isLogin = false;
+	pageStatus.waitFetch = true;
 
 	onMount(async () => {
 		try {
@@ -26,6 +27,7 @@
 		} catch (err) {
 			pageStatus.isLogin = false;
 		}
+		pageStatus.waitFetch = false;
 		authCheckDone = true;
 	});
 

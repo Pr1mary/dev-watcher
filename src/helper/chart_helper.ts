@@ -1,6 +1,6 @@
 import { Chart, type ChartItem } from "chart.js";
 
-const createBarChart = (chartCanvas: HTMLElement, labelName: string, labelList: string[], valueList: number[]) => {
+const createBarChart = (chartCanvas: HTMLElement, labelList: string[], labelName: string, valueList: number[]) => {
 
     new Chart(chartCanvas as ChartItem, {
         type: "bar",
@@ -16,8 +16,22 @@ const createBarChart = (chartCanvas: HTMLElement, labelName: string, labelList: 
             scales: {
                 y: {
                     beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    },
+                },
+                x: {
+                    stacked: true,
+                }
+            },
+            maintainAspectRatio: false,
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false,
                 }
             }
+
         }
     });
 }
