@@ -8,13 +8,17 @@
 		ModalBody,
 		ModalHeader,
 		Navbar,
-
 		Spinner
-
 	} from '@sveltestrap/sveltestrap';
 
 	import { onMount } from 'svelte';
-	import { authSessionEvent, login, logout, updatePass, type UserIntf } from '../helper/firebase_helper';
+	import {
+		authSessionEvent,
+		login,
+		logout,
+		updatePass,
+		type UserIntf
+	} from '../helper/firebase_helper';
 	import { pageStatus } from '../helper/shared_state_helper.svelte';
 
 	let { children } = $props();
@@ -22,8 +26,8 @@
 	const SettingsMenuEnum = {
 		BASE: 0,
 		CHANGE_PASSWORD: 1,
-		ABOUT: 2,
-	}
+		ABOUT: 2
+	};
 
 	let inputEmail = $state();
 	let inputPassword = $state();
@@ -39,7 +43,7 @@
 
 	onMount(async () => {
 		try {
-			pageStatus.isLogin = (await authSessionEvent(sessionStorage, 'userData')) as boolean
+			pageStatus.isLogin = (await authSessionEvent(sessionStorage, 'userData')) as boolean;
 		} catch (err) {
 			pageStatus.isLogin = false;
 		}
@@ -59,7 +63,7 @@
 	const toggleShowSettings = () => {
 		showSettingsFlag = !showSettingsFlag;
 		currSettingsMenu = SettingsMenuEnum.BASE;
-	}
+	};
 
 	const settingsMenuSwitch = (menuOption: number) => {
 		currSettingsMenu = menuOption;
@@ -67,18 +71,16 @@
 		if (currSettingsMenu === SettingsMenuEnum.CHANGE_PASSWORD) {
 			const rawUserData = sessionStorage.getItem('userData');
 			if (rawUserData !== null) {
-				
-
 				const userData: UserIntf = JSON.parse(rawUserData);
-				inputEmail =  userData.email;
+				inputEmail = userData.email;
 			}
 		} else {
-			inputEmail = "";
-			inputPassword = "";
-			inputNewPassword = "";
-			inputNewPasswordRe = "";
+			inputEmail = '';
+			inputPassword = '';
+			inputNewPassword = '';
+			inputNewPasswordRe = '';
 		}
-	}
+	};
 
 	const processLogin = async () => {
 		// wait process flag set to true until this process completed
@@ -109,7 +111,7 @@
 				console.log('Unknown error when logging in');
 			}
 		}
-		
+
 		// wait process flag set to true until this process completed
 		waitProcess = false;
 	};
@@ -120,18 +122,20 @@
 
 		// update password flow
 		try {
-			if (typeof inputEmail !== 'string' ||
+			if (
+				typeof inputEmail !== 'string' ||
 				typeof inputPassword !== 'string' ||
 				typeof inputNewPassword !== 'string' ||
-				typeof inputNewPasswordRe !== 'string') {
+				typeof inputNewPasswordRe !== 'string'
+			) {
 				throw 'Neither email nor password is string';
 			}
 
 			if (inputNewPassword !== inputNewPasswordRe) {
-				inputPassword = "";
-				inputNewPassword = "";
-				inputNewPasswordRe = "";
-				alert("Password and Retyped Password is not same!");
+				inputPassword = '';
+				inputNewPassword = '';
+				inputNewPasswordRe = '';
+				alert('Password and Retyped Password is not same!');
 				return;
 			}
 			const updateSuccess = await updatePass(inputEmail, inputPassword, inputNewPassword);
@@ -143,7 +147,7 @@
 				inputNewPasswordRe = '';
 				currSettingsMenu = SettingsMenuEnum.BASE;
 			} else {
-				throw Error("Error when updating password to firebase");
+				throw Error('Error when updating password to firebase');
 			}
 		} catch (error) {
 			alert('Update password error, please contact administrator!');
@@ -153,19 +157,11 @@
 				console.log('Unknown error when update password');
 			}
 		}
-		
+
 		// wait process flag set to true until this process completed
 		waitProcess = false;
 	};
 </script>
-
-<style>
-	.menu-btn {
-		margin-top: 2%;
-		margin-bottom: 3%;
-		text-decoration: none;
-	}
-</style>
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
@@ -182,12 +178,12 @@
 <Navbar class="mb-4 shadow sticky-top" color="light" expand="md">
 	<Container class="d-flex justify-content-between">
 		<h2>Project Uptime</h2>
-		
+
 		<Button
 			disabled={!(authCheckDone && pageStatus.isLogin)}
 			onclick={() => toggleShowSettings()}
 			aria-label="settings"
-			>
+		>
 			<Icon name="gear-fill" />
 		</Button>
 	</Container>
@@ -212,12 +208,14 @@
 			</div>
 			<div class="mb-3">
 				<label for="input-password" class="form-label">Password</label>
-				<input bind:value={inputPassword} type="password" class="form-control" id="input-password" />
+				<input
+					bind:value={inputPassword}
+					type="password"
+					class="form-control"
+					id="input-password"
+				/>
 			</div>
-			<button
-				class="btn btn-primary"
-				onclick={processLogin}
-				disabled={waitProcess}
+			<button class="btn btn-primary" onclick={processLogin} disabled={waitProcess}
 				>Login {#if waitProcess}<Spinner size="sm"></Spinner>{/if}
 			</button>
 		</ModalBody>
@@ -226,38 +224,28 @@
 
 <!-- show the modal when open settings flag is true -->
 <Modal isOpen={showSettingsFlag} centered={true}>
-	<ModalHeader toggle={toggleShowSettings}>
-		Settings
-	</ModalHeader>
+	<ModalHeader toggle={toggleShowSettings}>Settings</ModalHeader>
 	<ModalBody>
 		{#if currSettingsMenu == SettingsMenuEnum.BASE}
 			<Container class="d-flex flex-column">
 				<a
 					href="/"
 					class="menu-btn"
-					onclick={() => settingsMenuSwitch(SettingsMenuEnum.CHANGE_PASSWORD)}>
+					onclick={() => settingsMenuSwitch(SettingsMenuEnum.CHANGE_PASSWORD)}
+				>
 					<h6><Icon name="briefcase" /> Change Password</h6>
 				</a>
-				<a
-					href="/"
-					class="menu-btn"
-					onclick={() => settingsMenuSwitch(SettingsMenuEnum.ABOUT)}>
+				<a href="/" class="menu-btn" onclick={() => settingsMenuSwitch(SettingsMenuEnum.ABOUT)}>
 					<h6><Icon name="info-circle" /> About</h6>
 				</a>
-				<a
-					href="/"
-					class="menu-btn"
-					onclick={logoutProcess}>
+				<a href="/" class="menu-btn" onclick={logoutProcess}>
 					<h6><Icon name="box-arrow-right" /> Sign-Out</h6>
 				</a>
 			</Container>
 		{:else if currSettingsMenu == SettingsMenuEnum.CHANGE_PASSWORD}
 			<Container>
 				<div class="mb-3">
-					<a
-						href="/"
-						class="menu-btn"
-						onclick={() => settingsMenuSwitch(SettingsMenuEnum.BASE)}>
+					<a href="/" class="menu-btn" onclick={() => settingsMenuSwitch(SettingsMenuEnum.BASE)}>
 						<h6><Icon name="arrow-left" /> Change Password</h6>
 					</a>
 				</div>
@@ -275,32 +263,41 @@
 				</div>
 				<div class="mb-3">
 					<label for="input-password" class="form-label">Current Password</label>
-					<input bind:value={inputPassword} type="password" class="form-control" id="input-password" />
+					<input
+						bind:value={inputPassword}
+						type="password"
+						class="form-control"
+						id="input-password"
+					/>
 				</div>
 				<div class="mb-3">
 					<label for="input-password" class="form-label">New Password</label>
-					<input bind:value={inputNewPassword} type="password" class="form-control" id="input-password" />
+					<input
+						bind:value={inputNewPassword}
+						type="password"
+						class="form-control"
+						id="input-password"
+					/>
 				</div>
 				<div class="mb-3">
 					<label for="input-password-re" class="form-label">Retype New Password</label>
-					<input bind:value={inputNewPasswordRe} type="password" class="form-control" id="input-password-re" />
+					<input
+						bind:value={inputNewPasswordRe}
+						type="password"
+						class="form-control"
+						id="input-password-re"
+					/>
 				</div>
-				<button
-					class="btn btn-primary"
-					onclick={processUpdatePassword}
-					disabled={waitProcess}
+				<button class="btn btn-primary" onclick={processUpdatePassword} disabled={waitProcess}
 					>Submit Update {#if waitProcess}<Spinner size="sm"></Spinner>{/if}
 				</button>
 			</Container>
 		{:else if currSettingsMenu == SettingsMenuEnum.ABOUT}
 			<Container class="d-flex flex-column">
-				<a
-					href="/"
-					class="menu-btn"
-					onclick={() => settingsMenuSwitch(SettingsMenuEnum.BASE)}>
+				<a href="/" class="menu-btn" onclick={() => settingsMenuSwitch(SettingsMenuEnum.BASE)}>
 					<h6><Icon name="arrow-left" /> About</h6>
 				</a>
-				
+
 				<p>Uptime monitoring dashboard with firebase stack</p>
 			</Container>
 		{/if}
@@ -308,3 +305,11 @@
 </Modal>
 
 {@render children?.()}
+
+<style>
+	.menu-btn {
+		margin-top: 2%;
+		margin-bottom: 3%;
+		text-decoration: none;
+	}
+</style>

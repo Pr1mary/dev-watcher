@@ -1,13 +1,21 @@
 import { initializeApp } from 'firebase/app';
-import { EmailAuthProvider, getAuth, onAuthStateChanged, reauthenticateWithCredential, signInWithEmailAndPassword, signOut, updatePassword } from 'firebase/auth';
+import {
+	EmailAuthProvider,
+	getAuth,
+	onAuthStateChanged,
+	reauthenticateWithCredential,
+	signInWithEmailAndPassword,
+	signOut,
+	updatePassword
+} from 'firebase/auth';
 import { collection, getDocs, getFirestore, Timestamp } from 'firebase/firestore/lite';
 import firebase_config from './firebase_config.json';
 
 interface UserIntf {
-		id: string,
-		name: string,
-		anonymous: boolean,
-		email: string,
+	id: string;
+	name: string;
+	anonymous: boolean;
+	email: string;
 }
 
 const app = initializeApp(firebase_config);
@@ -46,7 +54,7 @@ const logout = async () => {
 
 const updatePass = async (email: string, currPassword: string, newPassword: string) => {
 	let updateSuccess = false;
-	
+
 	try {
 		const user = auth.currentUser;
 		if (user === null) {
@@ -72,7 +80,6 @@ const updatePass = async (email: string, currPassword: string, newPassword: stri
 };
 
 const authSessionEvent = (storage: Storage, storageKey: string) => {
-	
 	return new Promise((resolve, reject) => {
 		onAuthStateChanged(
 			auth,
@@ -80,9 +87,9 @@ const authSessionEvent = (storage: Storage, storageKey: string) => {
 				if (user != null) {
 					const userData: UserIntf = {
 						id: user.uid,
-						name: user.displayName || "",
+						name: user.displayName || '',
 						anonymous: user.isAnonymous,
-						email: user.email || "",
+						email: user.email || ''
 					};
 					storage.setItem(storageKey, JSON.stringify(userData));
 					resolve(true);
@@ -109,14 +116,6 @@ const fetchData = async (collectionName: string) => {
 	return result;
 };
 
-export {
-	login,
-	logout,
-	updatePass,
-	authSessionEvent,
-	fetchData,
-	Timestamp
-};
+export { login, logout, updatePass, authSessionEvent, fetchData, Timestamp };
 
 export type { UserIntf };
-

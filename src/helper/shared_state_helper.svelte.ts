@@ -1,6 +1,6 @@
 const pageStatus = $state({
-    isLogin: false,
-    waitFetch: false,
+	isLogin: false,
+	waitFetch: false
 });
 
 export { pageStatus };
