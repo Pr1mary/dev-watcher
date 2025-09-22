@@ -76,18 +76,20 @@
 		}
 	}
 
-	const processLogin = async (email: unknown, password: unknown) => {
+	const processLogin = async () => {
 		try {
-			if (typeof email !== 'string' || typeof password !== 'string') {
+			if (typeof inputEmail !== 'string' || typeof inputPassword !== 'string') {
 				throw 'Neither email nor password is string';
 			}
 
-			const userData = await login(email, password);
+			const userData = await login(inputEmail, inputPassword);
 			if (userData != null) {
 				console.log('User succesfully signed in!');
 				pageStatus.isLogin = true;
-				email = '';
-				password = '';
+				inputEmail = '';
+				inputPassword = '';
+				inputNewPassword = '';
+				inputNewPasswordRe = '';
 			} else {
 				alert('Email or Password might be wrong!');
 			}
@@ -195,7 +197,7 @@
 				<label for="input-password" class="form-label">Password</label>
 				<input bind:value={inputPassword} type="password" class="form-control" id="input-password" />
 			</div>
-			<button class="btn btn-primary" onclick={async () => processLogin(inputEmail, inputPassword)}
+			<button class="btn btn-primary" onclick={processLogin}
 				>Submit</button
 			>
 		</ModalBody>
@@ -263,7 +265,7 @@
 					<label for="input-password-re" class="form-label">Retype New Password</label>
 					<input bind:value={inputNewPasswordRe} type="password" class="form-control" id="input-password-re" />
 				</div>
-				<button class="btn btn-primary" onclick={async () => processUpdatePassword()}
+				<button class="btn btn-primary" onclick={processUpdatePassword}
 					>Submit Update</button
 				>
 			</Container>
