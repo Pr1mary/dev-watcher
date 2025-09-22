@@ -7,7 +7,10 @@
 		Modal,
 		ModalBody,
 		ModalHeader,
-		Navbar
+		Navbar,
+
+		Spinner
+
 	} from '@sveltestrap/sveltestrap';
 
 	import { onMount } from 'svelte';
@@ -29,6 +32,7 @@
 	let authCheckDone = $state(false);
 	let showSettingsFlag = $state(false);
 	let currSettingsMenu = $state(SettingsMenuEnum.BASE);
+	let waitProcess = $state(false);
 
 	pageStatus.isLogin = false;
 	pageStatus.waitFetch = true;
@@ -77,6 +81,10 @@
 	}
 
 	const processLogin = async () => {
+		// wait process flag set to true until this process completed
+		waitProcess = true;
+
+		// login process
 		try {
 			if (typeof inputEmail !== 'string' || typeof inputPassword !== 'string') {
 				throw 'Neither email nor password is string';
@@ -101,9 +109,16 @@
 				console.log('Unknown error when logging in');
 			}
 		}
+		
+		// wait process flag set to true until this process completed
+		waitProcess = false;
 	};
 
 	const processUpdatePassword = async () => {
+		// wait process flag set to true until this process completed
+		waitProcess = true;
+
+		// update password flow
 		try {
 			if (typeof inputEmail !== 'string' ||
 				typeof inputPassword !== 'string' ||
@@ -119,7 +134,6 @@
 				alert("Password and Retyped Password is not same!");
 				return;
 			}
-
 			const updateSuccess = await updatePass(inputEmail, inputPassword, inputNewPassword);
 			if (updateSuccess) {
 				alert('Password successfully updated!');
@@ -139,6 +153,9 @@
 				console.log('Unknown error when update password');
 			}
 		}
+		
+		// wait process flag set to true until this process completed
+		waitProcess = false;
 	};
 </script>
 
@@ -197,9 +214,12 @@
 				<label for="input-password" class="form-label">Password</label>
 				<input bind:value={inputPassword} type="password" class="form-control" id="input-password" />
 			</div>
-			<button class="btn btn-primary" onclick={processLogin}
-				>Submit</button
-			>
+			<button
+				class="btn btn-primary"
+				onclick={processLogin}
+				disabled={waitProcess}
+				>Login {#if waitProcess}<Spinner size="sm"></Spinner>{/if}
+			</button>
 		</ModalBody>
 	</Modal>
 {/if}
@@ -265,9 +285,12 @@
 					<label for="input-password-re" class="form-label">Retype New Password</label>
 					<input bind:value={inputNewPasswordRe} type="password" class="form-control" id="input-password-re" />
 				</div>
-				<button class="btn btn-primary" onclick={processUpdatePassword}
-					>Submit Update</button
-				>
+				<button
+					class="btn btn-primary"
+					onclick={processUpdatePassword}
+					disabled={waitProcess}
+					>Submit Update {#if waitProcess}<Spinner size="sm"></Spinner>{/if}
+				</button>
 			</Container>
 		{:else if currSettingsMenu == SettingsMenuEnum.ABOUT}
 			<Container class="d-flex flex-column">
