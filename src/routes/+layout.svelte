@@ -8,7 +8,10 @@
 		ModalBody,
 		ModalHeader,
 		Navbar,
-		Spinner
+		Spinner,
+
+		Styles
+
 	} from '@sveltestrap/sveltestrap';
 
 	import { onMount } from 'svelte';
@@ -161,6 +164,8 @@
 		// wait process flag set to true until this process completed
 		waitProcess = false;
 	};
+
+	let theme: "auto" | "dark" | "light" = "light";
 </script>
 
 <svelte:head>
@@ -175,7 +180,9 @@
 	/>
 </svelte:head>
 
-<Navbar class="mb-4 shadow sticky-top" color="light" expand="md">
+<Styles {theme}/>
+
+<Navbar class="mb-4 shadow sticky-top" color={theme} expand="md">
 	<Container class="d-flex justify-content-between">
 		<h2>Project Uptime</h2>
 

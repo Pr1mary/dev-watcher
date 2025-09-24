@@ -59,25 +59,29 @@
 			fetchData('machine-uptime')
 				.then((rawDataList) => {
 					for (const data of rawDataList) {
-						const date = new Date();
-						const updateIntervalMs = (data as RawDeviceData).interval_min * 60 * 1000;
-						const lastUpdate = (data as RawDeviceData).last_update;
+						try {
+							const date = new Date();
+							const updateIntervalMs = (data as RawDeviceData).interval_min * 60 * 1000;
+							const lastUpdate = (data as RawDeviceData).last_update;
 
-						const isExpired = date.getTime() - lastUpdate.toDate().getTime() > updateIntervalMs;
+							const isExpired = date.getTime() - lastUpdate.toDate().getTime() > updateIntervalMs;
 
-						const machineName = (data as RawDeviceData).machine_id;
-						const formattedData: DeviceData = {
-							displayName:
-								machineName.length > 10 ? machineName.substring(0, 10) + '...' : machineName,
-							machineName: machineName,
-							localIp: (data as RawDeviceData).local_ip || '-',
-							publicIp: (data as RawDeviceData).public_ip || '-',
-							lastUpdate: (data as RawDeviceData).last_update.toDate(),
-							osType: (data as RawDeviceData).os_type || 'Unknown',
-							expired: isExpired,
-							uptimeDateList: [0, 0, 1, 0, 0, 0]
-						};
-						deviceList.push(formattedData);
+							const machineName = (data as RawDeviceData).machine_id;
+							const formattedData: DeviceData = {
+								displayName:
+									machineName.length > 10 ? machineName.substring(0, 10) + '...' : machineName,
+								machineName: machineName,
+								localIp: (data as RawDeviceData).local_ip || '-',
+								publicIp: (data as RawDeviceData).public_ip || '-',
+								lastUpdate: (data as RawDeviceData).last_update.toDate(),
+								osType: (data as RawDeviceData).os_type || 'Unknown',
+								expired: isExpired,
+								uptimeDateList: [0, 0, 1, 0, 0, 0]
+							};
+							deviceList.push(formattedData);
+						} catch (error) {
+							console.log("Found error when parsing data")
+						}
 					}
 					pageStatus.waitFetch = false;
 				})
@@ -86,53 +90,53 @@
 				});
 
 			// fetch machine startup timestamp log data
-			fetchData('machine-wakeup')
-				.then((rawDataList) => {
-					const startupDateMap = new Map();
+			// fetchData('machine-wakeup')
+			// 	.then((rawDataList) => {
+			// 		const startupDateMap = new Map();
 
-					for (const data of rawDataList) {
-						const rawDate = (data as RawStartupData).timestamp.toDate();
-						const dateKey = `${rawDate.getFullYear()}-${rawDate.getMonth()}-${rawDate.getDate()}`;
+			// 		for (const data of rawDataList) {
+			// 			const rawDate = (data as RawStartupData).timestamp.toDate();
+			// 			const dateKey = `${rawDate.getFullYear()}-${rawDate.getMonth()}-${rawDate.getDate()}`;
 
-						if (!startupDateMap.has(dateKey)) {
-							startupDateMap.set(dateKey, []);
-						}
+			// 			if (!startupDateMap.has(dateKey)) {
+			// 				startupDateMap.set(dateKey, []);
+			// 			}
 
-						const startupDataList = startupDateMap.get(dateKey) as StartupData[];
-						const startupData: StartupData = {
-							machineName: (data as RawStartupData).machine_id,
-							timestamp: rawDate
-						};
-						startupDataList.push(startupData);
-						startupDateMap.set(dateKey, startupDataList);
-					}
+			// 			const startupDataList = startupDateMap.get(dateKey) as StartupData[];
+			// 			const startupData: StartupData = {
+			// 				machineName: (data as RawStartupData).machine_id,
+			// 				timestamp: rawDate
+			// 			};
+			// 			startupDataList.push(startupData);
+			// 			startupDateMap.set(dateKey, startupDataList);
+			// 		}
 
-					// draw downtime graph
-					const dateList = [];
-					const dataVal = [];
-					const timerange = 7;
-					for (let i = timerange - 1; i >= 0; i--) {
-						const date = new Date();
-						date.setDate(date.getDate() - i);
+			// 		// draw downtime graph
+			// 		const dateList = [];
+			// 		const dataVal = [];
+			// 		const timerange = 7;
+			// 		for (let i = timerange - 1; i >= 0; i--) {
+			// 			const date = new Date();
+			// 			date.setDate(date.getDate() - i);
 
-						const dateKey = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-						dateList.push(dateKey);
+			// 			const dateKey = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+			// 			dateList.push(dateKey);
 
-						let downtimeCount = 0;
-						const startupDataList = (startupDateMap.get(dateKey) as StartupData[]) || [];
+			// 			let downtimeCount = 0;
+			// 			const startupDataList = (startupDateMap.get(dateKey) as StartupData[]) || [];
 
-						for (const startupData of startupDataList) {
-							downtimeCount += 1;
-						}
+			// 			for (const startupData of startupDataList) {
+			// 				downtimeCount += 1;
+			// 			}
 
-						dataVal.push(downtimeCount || 0);
-					}
+			// 			dataVal.push(downtimeCount || 0);
+			// 		}
 
-					createBarChart(graphLast7DaysCanvas as HTMLElement, dateList, 'Total Downtime', dataVal);
-				})
-				.catch((error) => {
-					console.log('Error fetching data: ', error);
-				});
+			// 		createBarChart(graphLast7DaysCanvas as HTMLElement, dateList, 'Total Downtime', dataVal);
+			// 	})
+			// 	.catch((error) => {
+			// 		console.log('Error fetching data: ', error);
+			// 	});
 		}
 
 		return () => {
@@ -145,7 +149,7 @@
 
 <Container>
 	{#if pageStatus.waitFetch}
-		<div>
+		<!-- <div>
 			<div><h4>Summary:</h4></div>
 			<Card body class="m-3" style="">
 				<CardTitle class="placeholder-glow">
@@ -158,10 +162,10 @@
 					<span class="placeholder col-7"></span>
 				</CardBody>
 			</Card>
-		</div>
+		</div> -->
 
 		<div>
-			<div><h4>Device List:</h4></div>
+			<!-- <div><h4>Device List:</h4></div> -->
 			<Card body class="m-3 shadow">
 				<CardTitle class="placeholder-glow">
 					<span class="placeholder col-6"></span>
@@ -178,7 +182,7 @@
 			</Card>
 		</div>
 	{:else if pageStatus.isLogin}
-		<div>
+		<!-- <div>
 			<div><h4>Summary:</h4></div>
 			<Card body class="m-3" style="">
 				<CardTitle>
@@ -193,10 +197,10 @@
 					</div>
 				</CardBody>
 			</Card>
-		</div>
+		</div> -->
 
 		<div class="">
-			<div><h4>Device List:</h4></div>
+			<!-- <div><h4>Device List:</h4></div> -->
 			{#each deviceList as data}
 				<Card body class="m-3 shadow">
 					<CardTitle>
