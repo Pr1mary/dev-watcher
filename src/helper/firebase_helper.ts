@@ -8,7 +8,7 @@ import {
 	signOut,
 	updatePassword
 } from 'firebase/auth';
-import { collection, getDocs, getFirestore, Timestamp } from 'firebase/firestore/lite';
+import { collection, where, getDocs, getFirestore, Timestamp, query, type WhereFilterOp } from 'firebase/firestore/lite';
 import firebase_config from './firebase_config.json';
 
 interface UserIntf {
@@ -116,6 +116,21 @@ const fetchData = async (collectionName: string) => {
 	return result;
 };
 
-export { login, logout, updatePass, authSessionEvent, fetchData, Timestamp };
+const fetchDataCustom = async (collectionName: string, queryClause: unknown[][]) => {
+	const result: object[] = [];
+	const queryBlock = query(
+		collection(db, collectionName),
+		...queryClause.map(
+			clause => where(clause[0] as string, clause[1] as WhereFilterOp, clause[2])
+		)
+	);
+	const queryData = await getDocs(queryBlock);
+	queryData.forEach((doc) => {
+		result.push(doc.data());
+	});
+	return result;
+}
+
+export { login, logout, updatePass, authSessionEvent, fetchData, fetchDataCustom, Timestamp };
 
 export type { UserIntf };

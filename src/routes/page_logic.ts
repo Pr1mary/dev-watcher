@@ -1,15 +1,23 @@
 
-import { fetchData, type Timestamp } from '../helper/firebase_helper';
+import { fetchData, fetchDataCustom, type Timestamp } from '../helper/firebase_helper';
 
 interface RawDeviceData {
     group_id: string;
     interval_min: number;
     last_update: Timestamp;
+    uptime_since: Timestamp;
     machine_id: string;
     local_ip: string;
     public_ip: string;
     os_type: string;
     uptime_date_list: Timestamp[];
+}
+
+interface RawDowntimeData {
+    id: string;
+    machine_id: string;
+    new_timestamp: Timestamp;
+    old_timestamp: Timestamp;
 }
 
 interface DeviceData {
@@ -18,9 +26,15 @@ interface DeviceData {
     publicIp: string;
     localIp: string;
     lastUpdate: Date;
+    upSince: Date;
     osType: string;
     expired: boolean;
     uptimeDateList: number[];
+}
+
+interface DowntimeData {
+    machineId: string;
+    count: number;
 }
 
 
@@ -32,11 +46,6 @@ const getDataProcess = async () => {
     try {
         const machineUptimeList = await fetchData('machine-uptime');
         for (const rawData of machineUptimeList) {
-            // try {
-                
-            // } catch (error) {
-            //     console.log("Found error when parsing data")
-            // }
 
             const data: RawDeviceData = rawData as RawDeviceData;
 
@@ -56,23 +65,57 @@ const getDataProcess = async () => {
                 lastUpdate: data.last_update.toDate(),
                 osType: data.os_type || 'Unknown',
                 expired: isExpired,
-                uptimeDateList: []
+                uptimeDateList: [],
+                upSince: data.uptime_since ? data.uptime_since.toDate() : new Date(0),
             };
             deviceList.push(formattedData);
         }
 
-        // draw downtime graph
-        const dateList = [];
+
         const timerange = 7;
+        const machineDowntimeList = await fetchDataCustom(
+            "machine-downtime",
+            [
+                ["new_timestamp", ">", new Date(new Date().getDate() - (timerange - 1))]
+            ]
+        );
         for (let i = timerange - 1; i >= 0; i--) {
             const date = new Date();
             date.setDate(date.getDate() - i);
 
-            const dateKey = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-            dateList.push(dateKey);
+            const totalDowntimeData: DowntimeData[] = [];
+
+            for (const rawData of machineDowntimeList) {
+                const currData = rawData as RawDowntimeData;
+
+                if (date.getDate() !== currData.new_timestamp.toDate().getDate()) {
+                    continue;
+                }
+
+                let currIdx = totalDowntimeData.findIndex(item => item.machineId == currData.machine_id);
+                if (currIdx < 0) {
+                    totalDowntimeData.push({
+                        machineId: currData.machine_id,
+                        count: 0
+                    });
+                    currIdx = totalDowntimeData.length - 1;
+                }
+
+                totalDowntimeData[currIdx].count += 1;
+            }
 
             for (const deviceData of deviceList) {
-                deviceData.uptimeDateList.push(0)
+                const dateInterval = new Date(date.getTime() - 1 * 60 * 1000);
+
+                if (deviceData.lastUpdate < (dateInterval)) {
+                    deviceData.uptimeDateList.push(-2);
+                } else if (deviceData.upSince >= date) {
+                    deviceData.uptimeDateList.push(-1);
+                } else {
+                    const downtimeCount = totalDowntimeData.find(item => item.machineId == deviceData.machineName)?.count || 0;
+                    deviceData.uptimeDateList.push(downtimeCount)
+                }
+                
             }
 
         }
