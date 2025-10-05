@@ -29,7 +29,15 @@ interface DeviceData {
     upSince: Date;
     osType: string;
     expired: boolean;
-    uptimeDateList: number[];
+    uptimeDateList: UpdateDateData[];
+    daysRange: number;
+}
+
+interface UpdateDateData {
+    id: string;
+    count: number;
+    // message: string;
+    timestamp: Date;
 }
 
 interface DowntimeData {
@@ -67,6 +75,7 @@ const getDataProcess = async () => {
                 expired: isExpired,
                 uptimeDateList: [],
                 upSince: data.uptime_since ? data.uptime_since.toDate() : new Date(0),
+                daysRange: 0,
             };
             deviceList.push(formattedData);
         }
@@ -106,15 +115,33 @@ const getDataProcess = async () => {
 
             for (const deviceData of deviceList) {
                 const dateInterval = new Date(date.getTime() - 1 * 60 * 1000);
-
+                const dataId = crypto.randomUUID()
+                
                 if (deviceData.lastUpdate < (dateInterval)) {
-                    deviceData.uptimeDateList.push(-2);
+                    deviceData.uptimeDateList.push({
+                        id: dataId,
+                        count: -2,
+                        // message: "No status since...",
+                        timestamp: date
+                    });
                 } else if (deviceData.upSince >= date) {
-                    deviceData.uptimeDateList.push(-1);
+                    deviceData.uptimeDateList.push({
+                        id: dataId,
+                        count: -1,
+                        // message: "",
+                        timestamp: date
+                    });
                 } else {
                     const downtimeCount = totalDowntimeData.find(item => item.machineId == deviceData.machineName)?.count || 0;
-                    deviceData.uptimeDateList.push(downtimeCount)
+                    deviceData.uptimeDateList.push({
+                        id: dataId,
+                        count: downtimeCount,
+                        // message: "",
+                        timestamp: date
+                    })
                 }
+
+                deviceData.daysRange = timerange;
                 
             }
 

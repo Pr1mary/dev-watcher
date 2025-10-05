@@ -1,13 +1,17 @@
 <script lang="ts">
 	import {
 		Badge,
+		Button,
 		Card,
 		CardBody,
 		CardFooter,
 		CardTitle,
 		Container,
 
-		Row
+		Row,
+
+		Tooltip
+
 
 	} from '@sveltestrap/sveltestrap';
 	import { pageStatus } from '../helper/shared_state_helper.svelte';
@@ -89,18 +93,28 @@
 										Local IP: <strong>{data.localIp}</strong><br />
 									</div>
 									<div class="col-12 col-md-6 text-md-end">
-										Uptime last 7 days<br />
-										{#each data.uptimeDateList as downCount}
-											{#if downCount == -2}
-												<Badge class="text-bg-danger me-1">X</Badge>
-											{:else if downCount == -1}
-												<Badge class="text-bg-secondary me-1">?</Badge>
-											{:else if downCount == 0}
-												<Badge class="text-bg-success me-1">0</Badge>
-											{:else}
-												<Badge class="text-bg-warning me-1">{downCount}</Badge>
-											{/if}
-										{/each}
+										Uptime last {data.daysRange} days<br />
+										<div class="user-select-none">
+											{#each data.uptimeDateList as downCount}
+												{#if downCount.count == -2}
+												<a href="#" onmousedown={() => console.log("Button click")}>
+													<Badge class="text-bg-danger me-1">X</Badge>
+												</a>	
+												{:else if downCount.count == -1}
+												<a href="#" onmousedown={() => console.log("Button click")}>
+													<Badge class="text-bg-secondary me-1">?</Badge>
+												</a>
+												{:else if downCount.count == 0}
+												<a href="#" onmousedown={() => console.log("Button click")}>
+													<Badge class="text-bg-success me-1">0</Badge>
+												</a>
+												{:else}
+												<a href="#" onmousedown={() => console.log("Button click")}>
+													<Badge class="text-bg-warning me-1">{downCount.count}</Badge>
+												</a>
+												{/if}
+											{/each}
+										</div>
 									</div>
 								</Row>
 							</Container>
