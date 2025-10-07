@@ -41,6 +41,8 @@
 	let currSettingsMenu = $state(SettingsMenuEnum.BASE);
 	let waitProcess = $state(false);
 	let darkModeToggle = $state(false);
+	
+	let themeLoaded = false;
 
 	pageStatus.isLogin = false;
 	pageStatus.waitFetch = true;
@@ -169,12 +171,21 @@
 	let theme: 'dark' | 'light' = $state("dark");
 
 	$effect(() => {
-		if (darkModeToggle) {
-			theme = "dark"
-		} else {
-			theme = "light"
+		if (!themeLoaded) {
+			let lastDarkMode = localStorage.getItem("darkmode");
+			if (lastDarkMode && lastDarkMode === "enabled") {
+				darkModeToggle = true;
+			}
+			themeLoaded = true;
 		}
-		console.log(darkModeToggle);
+
+		if (darkModeToggle) {
+			theme = "dark";
+			localStorage.setItem("darkmode", "enabled");
+		} else {
+			theme = "light";
+			localStorage.setItem("darkmode", "disabled");
+		}
 	});
 </script>
 
