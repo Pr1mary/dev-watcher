@@ -29,7 +29,7 @@
 		BASE: 0,
 		CHANGE_PASSWORD: 1,
 		ABOUT: 2,
-		APP_CONFIG: 3,
+		APP_CONFIG: 3
 	};
 
 	let inputEmail = $state();
@@ -41,7 +41,7 @@
 	let currSettingsMenu = $state(SettingsMenuEnum.BASE);
 	let waitProcess = $state(false);
 	let darkModeToggle = $state(false);
-	
+
 	let themeLoaded = false;
 
 	pageStatus.isLogin = false;
@@ -168,23 +168,23 @@
 		waitProcess = false;
 	};
 
-	let theme: 'dark' | 'light' = $state("dark");
+	let theme: 'dark' | 'light' = $state('dark');
 
 	$effect(() => {
 		if (!themeLoaded) {
-			let lastDarkMode = localStorage.getItem("darkmode");
-			if (lastDarkMode && lastDarkMode === "enabled") {
+			let lastDarkMode = localStorage.getItem('darkmode');
+			if (lastDarkMode && lastDarkMode === 'enabled') {
 				darkModeToggle = true;
 			}
 			themeLoaded = true;
 		}
 
 		if (darkModeToggle) {
-			theme = "dark";
-			localStorage.setItem("darkmode", "enabled");
+			theme = 'dark';
+			localStorage.setItem('darkmode', 'enabled');
 		} else {
-			theme = "light";
-			localStorage.setItem("darkmode", "disabled");
+			theme = 'light';
+			localStorage.setItem('darkmode', 'disabled');
 		}
 	});
 </script>
@@ -262,16 +262,20 @@
 					class="menu-btn"
 					onclick={() => settingsMenuSwitch(SettingsMenuEnum.CHANGE_PASSWORD)}
 				>
-					<h6><Icon name="briefcase" />  Change Password</h6>
+					<h6><Icon name="briefcase" /> Change Password</h6>
 				</a>
-				<a href="/" class="menu-btn" onclick={() => settingsMenuSwitch(SettingsMenuEnum.APP_CONFIG)}>
-					<h6><Icon name="sliders" />  App Config</h6>
+				<a
+					href="/"
+					class="menu-btn"
+					onclick={() => settingsMenuSwitch(SettingsMenuEnum.APP_CONFIG)}
+				>
+					<h6><Icon name="sliders" /> App Config</h6>
 				</a>
 				<a href="/" class="menu-btn" onclick={() => settingsMenuSwitch(SettingsMenuEnum.ABOUT)}>
-					<h6><Icon name="info-circle" />  About</h6>
+					<h6><Icon name="info-circle" /> About</h6>
 				</a>
 				<a href="/" class="menu-btn" onclick={logoutProcess}>
-					<h6><Icon name="box-arrow-right" />  Sign-Out</h6>
+					<h6><Icon name="box-arrow-right" /> Sign-Out</h6>
 				</a>
 			</Container>
 		{:else if currSettingsMenu == SettingsMenuEnum.CHANGE_PASSWORD}
@@ -338,7 +342,7 @@
 					<h6><Icon name="arrow-left" /> App Config</h6>
 				</a>
 				<div>
-					<Input theme="light" type="switch" label="Dark mode" bind:checked={darkModeToggle}/>
+					<Input theme="light" type="switch" label="Dark mode" bind:checked={darkModeToggle} />
 				</div>
 			</Container>
 		{/if}
