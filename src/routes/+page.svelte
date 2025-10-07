@@ -20,6 +20,22 @@
 	import { createBarChart } from '../helper/chart_helper';
 
 	let deviceList: DeviceData[] = $state([]);
+	let tooltipRefs: unknown[] = $state([]);
+
+	const badgeMouseEvent = (event: Event, domId: string) => {
+		
+		const injectClass = "fs-5";
+		if (event.type === "mouseenter" && event.currentTarget) {
+			const domObj = event.currentTarget as HTMLElement;
+			const currClassName = domObj.className.split(" ");
+			currClassName.push(injectClass);
+			domObj.className = currClassName.join(" ");
+		} else if (event.type === "mouseleave" && event.currentTarget) {
+			const domObj = event.currentTarget as HTMLElement
+			const currClassName = domObj.className.split(" ")
+			domObj.className = currClassName.filter(val => val !== injectClass).join(" ");
+		}
+	};
 
 	$effect(() => {
 		if (pageStatus.isLogin) {
@@ -68,7 +84,7 @@
 	{:else if pageStatus.isLogin}
 		<Container>
 			<Row>
-				{#each deviceList as data}
+				{#each deviceList as data, dev_id}
 					<div class="col-12 col-xl-6">
 					<Card body class="m-3 shadow">
 						<CardTitle>
@@ -95,24 +111,29 @@
 									<div class="col-12 col-md-6 text-md-end">
 										Uptime last {data.daysRange} days<br />
 										<div class="user-select-none">
-											{#each data.uptimeDateList as downCount}
-												{#if downCount.count == -2}
-												<a href="#" onmousedown={() => console.log("Button click")}>
-													<Badge class="text-bg-danger me-1">X</Badge>
-												</a>	
-												{:else if downCount.count == -1}
-												<a href="#" onmousedown={() => console.log("Button click")}>
-													<Badge class="text-bg-secondary me-1">?</Badge>
-												</a>
-												{:else if downCount.count == 0}
-												<a href="#" onmousedown={() => console.log("Button click")}>
-													<Badge class="text-bg-success me-1">0</Badge>
-												</a>
-												{:else}
-												<a href="#" onmousedown={() => console.log("Button click")}>
-													<Badge class="text-bg-warning me-1">{downCount.count}</Badge>
-												</a>
-												{/if}
+											{#each data.uptimeDateList as downCount, idx}
+											<span>
+												<span
+												id={`badge-${dev_id}-${idx}`}
+												role="button"
+												tabindex="0"
+												onmouseenter={(event) => badgeMouseEvent(event, downCount.id)}
+												onmouseleave={(event) => badgeMouseEvent(event, downCount.id)}>
+													{#if downCount.count == -2}
+														<Badge class="text-bg-danger">X</Badge>
+													{:else if downCount.count == -1}
+														<Badge class="text-bg-secondary">?</Badge>
+													{:else if downCount.count == 0}
+														<Badge class="text-bg-success">0</Badge>
+													{:else}
+														<Badge class="text-bg-warning">{downCount.count}</Badge>
+													{/if}
+												</span>
+
+												<Tooltip target={`badge-${dev_id}-${idx}`} placement="bottom">
+													Total downtime at {downCount.timestamp}
+												</Tooltip>
+											</span>
 											{/each}
 										</div>
 									</div>
