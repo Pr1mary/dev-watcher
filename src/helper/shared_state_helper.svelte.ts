@@ -1,6 +1,6 @@
 interface PageStatusIntf {
-	isLogin: boolean,
-	waitFetch: boolean
+	isLogin: boolean;
+	waitFetch: boolean;
 }
 
 const pageStatus: PageStatusIntf = $state({

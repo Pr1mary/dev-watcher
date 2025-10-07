@@ -9,9 +9,7 @@
 		ModalHeader,
 		Navbar,
 		Spinner,
-
 		Styles
-
 	} from '@sveltestrap/sveltestrap';
 
 	import { onMount } from 'svelte';
@@ -165,7 +163,7 @@
 		waitProcess = false;
 	};
 
-	let theme: "auto" | "dark" | "light" = "light";
+	let theme: 'auto' | 'dark' | 'light' = 'light';
 </script>
 
 <svelte:head>
@@ -181,7 +179,7 @@
 	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
 </svelte:head>
 
-<Styles {theme}/>
+<Styles {theme} />
 
 <Navbar class="mb-4 shadow sticky-top" color={theme} expand="md">
 	<Container class="d-flex justify-content-between">
