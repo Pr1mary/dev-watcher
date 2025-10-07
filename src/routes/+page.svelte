@@ -22,7 +22,7 @@
 	let deviceList: DeviceData[] = $state([]);
 	let tooltipRefs: unknown[] = $state([]);
 
-	const badgeMouseEvent = (event: Event, domId: string) => {
+	const badgeMouseEvent = (event: Event) => {
 		
 		const injectClass = "fs-5";
 		if (event.type === "mouseenter" && event.currentTarget) {
@@ -117,8 +117,8 @@
 												id={`badge-${dev_id}-${idx}`}
 												role="button"
 												tabindex="0"
-												onmouseenter={(event) => badgeMouseEvent(event, downCount.id)}
-												onmouseleave={(event) => badgeMouseEvent(event, downCount.id)}>
+												onmouseenter={badgeMouseEvent}
+												onmouseleave={badgeMouseEvent}>
 													{#if downCount.count == -2}
 														<Badge class="text-bg-danger">X</Badge>
 													{:else if downCount.count == -1}
@@ -131,7 +131,18 @@
 												</span>
 
 												<Tooltip target={`badge-${dev_id}-${idx}`} placement="bottom">
-													Total downtime at {downCount.timestamp}
+													<div><strong>{downCount.timestamp.toDateString()}</strong></div>
+													<div>
+														{#if downCount.count == -2}
+															<strong>System down detected</strong>
+														{:else if downCount.count == -1}
+															No history on this day
+														{:else if downCount.count == 0}
+															System up without downtime
+														{:else}
+															System up with total downtime: <strong>{downCount.count}</strong>
+														{/if}
+													</div>
 												</Tooltip>
 											</span>
 											{/each}
