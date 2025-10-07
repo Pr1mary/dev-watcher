@@ -4,6 +4,7 @@
 		Button,
 		Container,
 		Icon,
+		Input,
 		Modal,
 		ModalBody,
 		ModalHeader,
@@ -27,7 +28,8 @@
 	const SettingsMenuEnum = {
 		BASE: 0,
 		CHANGE_PASSWORD: 1,
-		ABOUT: 2
+		ABOUT: 2,
+		APP_CONFIG: 3,
 	};
 
 	let inputEmail = $state();
@@ -38,6 +40,7 @@
 	let showSettingsFlag = $state(false);
 	let currSettingsMenu = $state(SettingsMenuEnum.BASE);
 	let waitProcess = $state(false);
+	let darkModeToggle = $state(false);
 
 	pageStatus.isLogin = false;
 	pageStatus.waitFetch = true;
@@ -163,7 +166,16 @@
 		waitProcess = false;
 	};
 
-	let theme: 'auto' | 'dark' | 'light' = 'light';
+	let theme: 'dark' | 'light' = $state("dark");
+
+	$effect(() => {
+		if (darkModeToggle) {
+			theme = "dark"
+		} else {
+			theme = "light"
+		}
+		console.log(darkModeToggle);
+	});
 </script>
 
 <svelte:head>
@@ -239,13 +251,16 @@
 					class="menu-btn"
 					onclick={() => settingsMenuSwitch(SettingsMenuEnum.CHANGE_PASSWORD)}
 				>
-					<h6><Icon name="briefcase" /> Change Password</h6>
+					<h6><Icon name="briefcase" />  Change Password</h6>
+				</a>
+				<a href="/" class="menu-btn" onclick={() => settingsMenuSwitch(SettingsMenuEnum.APP_CONFIG)}>
+					<h6><Icon name="sliders" />  App Config</h6>
 				</a>
 				<a href="/" class="menu-btn" onclick={() => settingsMenuSwitch(SettingsMenuEnum.ABOUT)}>
-					<h6><Icon name="info-circle" /> About</h6>
+					<h6><Icon name="info-circle" />  About</h6>
 				</a>
 				<a href="/" class="menu-btn" onclick={logoutProcess}>
-					<h6><Icon name="box-arrow-right" /> Sign-Out</h6>
+					<h6><Icon name="box-arrow-right" />  Sign-Out</h6>
 				</a>
 			</Container>
 		{:else if currSettingsMenu == SettingsMenuEnum.CHANGE_PASSWORD}
@@ -305,6 +320,15 @@
 				</a>
 
 				<p>Uptime monitoring dashboard with firebase stack</p>
+			</Container>
+		{:else if currSettingsMenu == SettingsMenuEnum.APP_CONFIG}
+			<Container class="d-flex flex-column">
+				<a href="/" class="menu-btn" onclick={() => settingsMenuSwitch(SettingsMenuEnum.BASE)}>
+					<h6><Icon name="arrow-left" /> App Config</h6>
+				</a>
+				<div>
+					<Input theme="light" type="switch" label="Dark mode" bind:checked={darkModeToggle}/>
+				</div>
 			</Container>
 		{/if}
 	</ModalBody>
