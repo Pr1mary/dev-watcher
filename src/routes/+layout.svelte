@@ -206,7 +206,7 @@
 
 <Navbar class="mb-4 shadow sticky-top" color={theme} expand="md">
 	<Container class="d-flex justify-content-between">
-		<h2>Project Uptime</h2>
+		<h2><Icon name="fire" /><strong>Flame</strong>Tower</h2>
 
 		<Button
 			disabled={!(authCheckDone && pageStatus.isLogin)}
