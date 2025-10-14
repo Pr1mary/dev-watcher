@@ -2,6 +2,7 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import {
 		Button,
+		Card,
 		Container,
 		Icon,
 		Input,
@@ -29,7 +30,8 @@
 		BASE: 0,
 		CHANGE_PASSWORD: 1,
 		ABOUT: 2,
-		APP_CONFIG: 3
+		APP_CONFIG: 3,
+		MANAGE_DEVICE: 4
 	};
 
 	let inputEmail = $state();
@@ -262,27 +264,30 @@
 					class="menu-btn"
 					onclick={() => settingsMenuSwitch(SettingsMenuEnum.CHANGE_PASSWORD)}
 				>
-					<h6><Icon name="briefcase" /> Change Password</h6>
+					<h6><Icon name="briefcase me-1" />Change Password</h6>
 				</a>
 				<a
 					href="/"
 					class="menu-btn"
 					onclick={() => settingsMenuSwitch(SettingsMenuEnum.APP_CONFIG)}
 				>
-					<h6><Icon name="sliders" /> App Config</h6>
+					<h6><Icon name="sliders me-1" />App Config</h6>
+				</a>
+				<a href="/" class="menu-btn" onclick={() => settingsMenuSwitch(SettingsMenuEnum.MANAGE_DEVICE)}>
+					<h6><Icon name="pc-display me-1" />Manage Device</h6>
 				</a>
 				<a href="/" class="menu-btn" onclick={() => settingsMenuSwitch(SettingsMenuEnum.ABOUT)}>
-					<h6><Icon name="info-circle" /> About</h6>
+					<h6><Icon name="info-circle me-1" />About</h6>
 				</a>
 				<a href="/" class="menu-btn" onclick={logoutProcess}>
-					<h6><Icon name="box-arrow-right" /> Sign-Out</h6>
+					<h6><Icon name="box-arrow-right me-1" />Sign-Out</h6>
 				</a>
 			</Container>
 		{:else if currSettingsMenu == SettingsMenuEnum.CHANGE_PASSWORD}
 			<Container>
 				<div class="mb-3">
 					<a href="/" class="menu-btn" onclick={() => settingsMenuSwitch(SettingsMenuEnum.BASE)}>
-						<h6><Icon name="arrow-left" /> Change Password</h6>
+						<h6><Icon name="arrow-left me-1" />Change Password</h6>
 					</a>
 				</div>
 
@@ -331,15 +336,32 @@
 		{:else if currSettingsMenu == SettingsMenuEnum.ABOUT}
 			<Container class="d-flex flex-column">
 				<a href="/" class="menu-btn" onclick={() => settingsMenuSwitch(SettingsMenuEnum.BASE)}>
-					<h6><Icon name="arrow-left" /> About</h6>
+					<h6><Icon name="arrow-left me-1" />About</h6>
 				</a>
 
 				<p>Uptime monitoring dashboard with firebase stack</p>
 			</Container>
+		{:else if currSettingsMenu == SettingsMenuEnum.MANAGE_DEVICE}
+			<Container class="d-flex flex-column" style="max-height: 500px;">
+				<a href="/" class="menu-btn" onclick={() => settingsMenuSwitch(SettingsMenuEnum.BASE)}>
+					<h6><Icon name="arrow-left me-1" />Manage Device</h6>
+				</a>
+
+				<div class="device-list overflow-auto">
+					{#each [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as num}
+						<Card body class="m-2">
+							<div class="d-flex justify-content-between ">
+								<span>Device num: {num}</span>
+								<a href="" class="text-danger"><Icon name="trash-fill" /></a>
+							</div>
+						</Card>
+					{/each}
+				</div>
+			</Container>
 		{:else if currSettingsMenu == SettingsMenuEnum.APP_CONFIG}
 			<Container class="d-flex flex-column">
 				<a href="/" class="menu-btn" onclick={() => settingsMenuSwitch(SettingsMenuEnum.BASE)}>
-					<h6><Icon name="arrow-left" /> App Config</h6>
+					<h6><Icon name="arrow-left me-1" />App Config</h6>
 				</a>
 				<div>
 					<Input theme="light" type="switch" label="Dark mode" bind:checked={darkModeToggle} />

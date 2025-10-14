@@ -12,11 +12,11 @@
 	} from '@sveltestrap/sveltestrap';
 	import { pageStatus } from '../helper/shared_state_helper.svelte';
 	import { getDataProcess, type DeviceData } from './page_logic';
-	import { Chart, type ChartItem } from 'chart.js/auto';
-	import { createBarChart } from '../helper/chart_helper';
+	// import { Chart, type ChartItem } from 'chart.js/auto';
+	// import { createBarChart } from '../helper/chart_helper';
 
 	let deviceList: DeviceData[] = $state([]);
-	let tooltipRefs: unknown[] = $state([]);
+	// let tooltipRefs: unknown[] = $state([]);
 
 	const badgeMouseEvent = (event: Event) => {
 		const injectClass = 'fs-5';
