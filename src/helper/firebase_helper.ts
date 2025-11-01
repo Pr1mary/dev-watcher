@@ -1,9 +1,12 @@
 import { initializeApp } from 'firebase/app';
 import {
+	browserLocalPersistence,
+	browserSessionPersistence,
 	EmailAuthProvider,
 	getAuth,
 	onAuthStateChanged,
 	reauthenticateWithCredential,
+	setPersistence,
 	signInWithEmailAndPassword,
 	signOut,
 	updatePassword
@@ -30,9 +33,10 @@ const app = initializeApp(firebase_config);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const login = async (email: string, password: string) => {
+const login = async (email: string, password: string, saveSession: boolean) => {
 	let user = null;
 	try {
+		await setPersistence(auth, (saveSession) ? browserLocalPersistence : browserSessionPersistence);
 		user = (await signInWithEmailAndPassword(auth, email, password)).user;
 	} catch (error: unknown) {
 		if (error instanceof Error) {

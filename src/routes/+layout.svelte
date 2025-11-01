@@ -14,14 +14,8 @@
 	} from '@sveltestrap/sveltestrap';
 
 	import { onMount } from 'svelte';
-	import {
-		authSessionEvent,
-		login,
-		logout,
-		updatePass,
-		type UserIntf
-	} from '../helper/firebase_helper';
 	import { pageStatus } from '../helper/shared_state_helper.svelte';
+	import { changePassRequest, checkLogin, getUserEmail, loginRequest, logoutRequest } from './layout_logic';
 
 	let { children } = $props();
 
@@ -32,10 +26,11 @@
 		APP_CONFIG: 3
 	};
 
-	let inputEmail = $state();
-	let inputPassword = $state();
-	let inputNewPassword = $state();
-	let inputNewPasswordRe = $state();
+	let inputEmail = $state("");
+	let inputPassword = $state("");
+	let inputNewPassword = $state("");
+	let inputNewPasswordRe = $state("");
+	let saveLogin = $state(false);
 	let authCheckDone = $state(false);
 	let showSettingsFlag = $state(false);
 	let currSettingsMenu = $state(SettingsMenuEnum.BASE);
@@ -48,17 +43,13 @@
 	pageStatus.waitFetch = true;
 
 	onMount(async () => {
-		try {
-			pageStatus.isLogin = (await authSessionEvent(sessionStorage, 'userData')) as boolean;
-		} catch (err) {
-			pageStatus.isLogin = false;
-		}
+		pageStatus.isLogin = (await checkLogin('userData')).isLogin;
 		pageStatus.waitFetch = false;
 		authCheckDone = true;
 	});
 
 	const logoutProcess = () => {
-		logout();
+		logoutRequest();
 		inputEmail = '';
 		inputPassword = '';
 		pageStatus.isLogin = false;
@@ -75,11 +66,7 @@
 		currSettingsMenu = menuOption;
 
 		if (currSettingsMenu === SettingsMenuEnum.CHANGE_PASSWORD) {
-			const rawUserData = sessionStorage.getItem('userData');
-			if (rawUserData !== null) {
-				const userData: UserIntf = JSON.parse(rawUserData);
-				inputEmail = userData.email;
-			}
+			inputEmail = getUserEmail('userData');
 		} else {
 			inputEmail = '';
 			inputPassword = '';
@@ -93,29 +80,23 @@
 		waitProcess = true;
 
 		// login process
-		try {
-			if (typeof inputEmail !== 'string' || typeof inputPassword !== 'string') {
-				throw 'Neither email nor password is string';
-			}
-
-			const userData = await login(inputEmail, inputPassword);
-			if (userData != null) {
-				console.log('User succesfully signed in!');
+		const userLogin = await loginRequest(inputEmail, inputPassword, saveLogin);
+		switch (userLogin.errorType) {
+			case 0:
+				console.log(userLogin.message);
 				pageStatus.isLogin = true;
 				inputEmail = '';
 				inputPassword = '';
 				inputNewPassword = '';
 				inputNewPasswordRe = '';
-			} else {
-				alert('Email or Password might be wrong!');
-			}
-		} catch (error) {
-			alert('Login error, please contact administrator!');
-			if (error instanceof Error) {
-				console.log('Error when logging in: ', error.message);
-			} else {
-				console.log('Unknown error when logging in');
-			}
+				break;
+			case 1:
+				alert(userLogin.message);
+				break;
+			default:
+				alert('Login error, please contact administrator!');
+				console.log(userLogin.message);
+				break;
 		}
 
 		// wait process flag set to true until this process completed
@@ -127,41 +108,23 @@
 		waitProcess = true;
 
 		// update password flow
-		try {
-			if (
-				typeof inputEmail !== 'string' ||
-				typeof inputPassword !== 'string' ||
-				typeof inputNewPassword !== 'string' ||
-				typeof inputNewPasswordRe !== 'string'
-			) {
-				throw 'Neither email nor password is string';
-			}
-
-			if (inputNewPassword !== inputNewPasswordRe) {
-				inputPassword = '';
-				inputNewPassword = '';
-				inputNewPasswordRe = '';
-				alert('Password and Retyped Password is not same!');
-				return;
-			}
-			const updateSuccess = await updatePass(inputEmail, inputPassword, inputNewPassword);
-			if (updateSuccess) {
-				alert('Password successfully updated!');
+		const changePassResult = await changePassRequest(inputEmail, inputPassword, inputNewPassword, inputNewPasswordRe);
+		switch (changePassResult.errorType) {
+			case 0:
+				alert(changePassResult.message);
 				inputEmail = '';
 				inputPassword = '';
 				inputNewPassword = '';
 				inputNewPasswordRe = '';
 				currSettingsMenu = SettingsMenuEnum.BASE;
-			} else {
-				throw Error('Error when updating password to firebase');
-			}
-		} catch (error) {
-			alert('Update password error, please contact administrator!');
-			if (error instanceof Error) {
-				console.log('Error when update password: ', error.message);
-			} else {
-				console.log('Unknown error when update password');
-			}
+				break;
+			case 1:
+				alert("Neither email nor password is string");
+				break;
+			default:
+				alert('Update password error, please contact administrator!');
+				console.log(changePassResult.message);
+				break;
 		}
 
 		// wait process flag set to true until this process completed
@@ -243,6 +206,14 @@
 					class="form-control"
 					id="input-password"
 				/>
+			</div>
+			<div class="mb-3">
+				<input
+				class="form-check-input"
+				type="checkbox"
+				bind:checked={saveLogin}
+				id="input-save-login">
+				<label for="input-save-login" class="form-label">Save login</label>
 			</div>
 			<button class="btn btn-primary" onclick={processLogin} disabled={waitProcess}
 				>Login {#if waitProcess}<Spinner size="sm"></Spinner>{/if}
