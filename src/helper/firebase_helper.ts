@@ -18,7 +18,9 @@ import {
 	getFirestore,
 	Timestamp,
 	query,
-	type WhereFilterOp
+	type WhereFilterOp,
+	deleteDoc,
+	doc
 } from 'firebase/firestore/lite';
 import firebase_config from './firebase_config.json';
 
@@ -143,6 +145,21 @@ const fetchDataCustom = async (collectionName: string, queryClause: unknown[][])
 	return result;
 };
 
-export { login, logout, updatePass, authSessionEvent, fetchData, fetchDataCustom, Timestamp };
+const deleteData = async (collectionName: string, docName: string) => {
+	const result = {
+		success: false,
+		message: "",
+	}
+	try {
+		await deleteDoc(doc(db, collectionName, docName));
+		result.success = true;
+	} catch (error) {
+		if (error instanceof Error) result.message = error.message;
+		else result.message = "Unknown error";
+	}
+	return result;
+}
+
+export { login, logout, updatePass, authSessionEvent, fetchData, fetchDataCustom, deleteData, Timestamp };
 
 export type { UserIntf };

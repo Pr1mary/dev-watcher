@@ -1,4 +1,4 @@
-import { fetchData, fetchDataCustom, type Timestamp } from '../helper/firebase_helper';
+import { deleteData, fetchData, fetchDataCustom, type Timestamp } from '../helper/firebase_helper';
 
 interface RawDeviceData {
 	group_id: string;
@@ -143,6 +143,12 @@ const getDataProcess = async () => {
 	return deviceList;
 };
 
-export { getDataProcess };
+const delDeviceProcess = async (machine_id: string) => {
+	const result = await deleteData('machine-uptime', machine_id);
+	if (!result.success) console.log('Error when removing data: ', result.message);
+	return result.success;
+}
+
+export { getDataProcess, delDeviceProcess };
 
 export type { DeviceData };

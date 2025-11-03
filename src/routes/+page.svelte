@@ -7,13 +7,19 @@
 		CardFooter,
 		CardTitle,
 		Container,
+		Dropdown,
+		DropdownItem,
+		DropdownMenu,
+		DropdownToggle,
+		Icon,
 		Row,
 		Tooltip
 	} from '@sveltestrap/sveltestrap';
 	import { pageStatus } from '../helper/shared_state_helper.svelte';
-	import { getDataProcess, type DeviceData } from './page_logic';
+	import { delDeviceProcess, getDataProcess, type DeviceData } from './page_logic';
 	import { Chart, type ChartItem } from 'chart.js/auto';
 	import { createBarChart } from '../helper/chart_helper';
+	import { browser } from '$app/environment';
 
 	let deviceList: DeviceData[] = $state([]);
 	let tooltipRefs: unknown[] = $state([]);
@@ -30,6 +36,21 @@
 			const currClassName = domObj.className.split(' ');
 			domObj.className = currClassName.filter((val) => val !== injectClass).join(' ');
 		}
+	};
+
+	const removeDevice = (event: MouseEvent) => {
+		const confRemove = confirm("Are you sure you want to remove this device?");
+		if (!confRemove) return;
+		
+		const elemTarget = event.currentTarget as HTMLElement;
+		const machineName = elemTarget.getAttribute("data-app-mach-name") || "";
+		delDeviceProcess(machineName)
+		.then(result => {
+			if (result) location.reload();
+		})
+		.catch(error => {
+			console.log("Error found: ", error)
+		});
 	};
 
 	$effect(() => {
@@ -80,15 +101,32 @@
 				{#each deviceList as data, dev_id}
 					<div class="col-12 col-xl-6">
 						<Card body class="m-3 shadow">
-							<CardTitle>
-								<div class="d-flex justify-content-between">
-									<div><strong>{data.displayName}</strong></div>
-									<div>
+							<CardTitle >
+								<div class="d-flex">
+									<div class="p-2 align-self-center">
 										{#if data.expired}
-											<Badge class="text-bg-danger">offline</Badge>
+											<Badge class="text-bg-danger">Offline</Badge>
 										{:else}
-											<Badge class="text-bg-success">online</Badge>
+											<Badge class="text-bg-success">Online</Badge>
 										{/if}
+									</div>
+									<div class="p-2 align-self-center">
+										<strong>{data.displayName}</strong>
+									</div>
+									<div class="ms-auto p-2 align-self-center">
+										<Dropdown>
+											<DropdownToggle nav class="nav-link">
+												<Icon name="three-dots-vertical" />
+											</DropdownToggle>
+											<DropdownMenu>
+												<DropdownItem
+												class="link-danger"
+												data-app-mach-name={data.machineName}
+												onclick={removeDevice}>
+													Remove device
+												</DropdownItem>
+											</DropdownMenu>
+										</Dropdown>
 									</div>
 								</div>
 							</CardTitle>
