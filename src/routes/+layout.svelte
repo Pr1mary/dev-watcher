@@ -15,7 +15,13 @@
 
 	import { onMount } from 'svelte';
 	import { pageStatus } from '../helper/shared_state_helper.svelte';
-	import { changePassRequest, checkLogin, getUserEmail, loginRequest, logoutRequest } from './layout_logic';
+	import {
+		changePassRequest,
+		checkLogin,
+		getUserEmail,
+		loginRequest,
+		logoutRequest
+	} from './layout_logic';
 
 	let { children } = $props();
 
@@ -26,10 +32,10 @@
 		APP_CONFIG: 3
 	};
 
-	let inputEmail = $state("");
-	let inputPassword = $state("");
-	let inputNewPassword = $state("");
-	let inputNewPasswordRe = $state("");
+	let inputEmail = $state('');
+	let inputPassword = $state('');
+	let inputNewPassword = $state('');
+	let inputNewPasswordRe = $state('');
 	let saveLogin = $state(false);
 	let authCheckDone = $state(false);
 	let showSettingsFlag = $state(false);
@@ -108,7 +114,12 @@
 		waitProcess = true;
 
 		// update password flow
-		const changePassResult = await changePassRequest(inputEmail, inputPassword, inputNewPassword, inputNewPasswordRe);
+		const changePassResult = await changePassRequest(
+			inputEmail,
+			inputPassword,
+			inputNewPassword,
+			inputNewPasswordRe
+		);
 		switch (changePassResult.errorType) {
 			case 0:
 				alert(changePassResult.message);
@@ -119,7 +130,7 @@
 				currSettingsMenu = SettingsMenuEnum.BASE;
 				break;
 			case 1:
-				alert("Neither email nor password is string");
+				alert('Neither email nor password is string');
 				break;
 			default:
 				alert('Update password error, please contact administrator!');
@@ -209,10 +220,11 @@
 			</div>
 			<div class="mb-3">
 				<input
-				class="form-check-input"
-				type="checkbox"
-				bind:checked={saveLogin}
-				id="input-save-login">
+					class="form-check-input"
+					type="checkbox"
+					bind:checked={saveLogin}
+					id="input-save-login"
+				/>
 				<label for="input-save-login" class="form-label">Save login</label>
 			</div>
 			<button class="btn btn-primary" onclick={processLogin} disabled={waitProcess}

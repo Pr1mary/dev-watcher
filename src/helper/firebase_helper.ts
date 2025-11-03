@@ -38,7 +38,7 @@ const db = getFirestore(app);
 const login = async (email: string, password: string, saveSession: boolean) => {
 	let user = null;
 	try {
-		await setPersistence(auth, (saveSession) ? browserLocalPersistence : browserSessionPersistence);
+		await setPersistence(auth, saveSession ? browserLocalPersistence : browserSessionPersistence);
 		user = (await signInWithEmailAndPassword(auth, email, password)).user;
 	} catch (error: unknown) {
 		if (error instanceof Error) {
@@ -148,18 +148,27 @@ const fetchDataCustom = async (collectionName: string, queryClause: unknown[][])
 const deleteData = async (collectionName: string, docName: string) => {
 	const result = {
 		success: false,
-		message: "",
-	}
+		message: ''
+	};
 	try {
 		await deleteDoc(doc(db, collectionName, docName));
 		result.success = true;
 	} catch (error) {
 		if (error instanceof Error) result.message = error.message;
-		else result.message = "Unknown error";
+		else result.message = 'Unknown error';
 	}
 	return result;
-}
+};
 
-export { login, logout, updatePass, authSessionEvent, fetchData, fetchDataCustom, deleteData, Timestamp };
+export {
+	login,
+	logout,
+	updatePass,
+	authSessionEvent,
+	fetchData,
+	fetchDataCustom,
+	deleteData,
+	Timestamp
+};
 
 export type { UserIntf };

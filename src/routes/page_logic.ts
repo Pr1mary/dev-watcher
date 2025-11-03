@@ -147,7 +147,7 @@ const delDeviceProcess = async (machine_id: string) => {
 	const result = await deleteData('machine-uptime', machine_id);
 	if (!result.success) console.log('Error when removing data: ', result.message);
 	return result.success;
-}
+};
 
 export { getDataProcess, delDeviceProcess };
 

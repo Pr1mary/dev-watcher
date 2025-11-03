@@ -39,18 +39,18 @@
 	};
 
 	const removeDevice = (event: MouseEvent) => {
-		const confRemove = confirm("Are you sure you want to remove this device?");
+		const confRemove = confirm('Are you sure you want to remove this device?');
 		if (!confRemove) return;
-		
+
 		const elemTarget = event.currentTarget as HTMLElement;
-		const machineName = elemTarget.getAttribute("data-app-mach-name") || "";
+		const machineName = elemTarget.getAttribute('data-app-mach-name') || '';
 		delDeviceProcess(machineName)
-		.then(result => {
-			if (result) location.reload();
-		})
-		.catch(error => {
-			console.log("Error found: ", error)
-		});
+			.then((result) => {
+				if (result) location.reload();
+			})
+			.catch((error) => {
+				console.log('Error found: ', error);
+			});
 	};
 
 	$effect(() => {
@@ -101,7 +101,7 @@
 				{#each deviceList as data, dev_id}
 					<div class="col-12 col-xl-6">
 						<Card body class="m-3 shadow">
-							<CardTitle >
+							<CardTitle>
 								<div class="d-flex">
 									<div class="p-2 align-self-center">
 										{#if data.expired}
@@ -120,9 +120,10 @@
 											</DropdownToggle>
 											<DropdownMenu>
 												<DropdownItem
-												class="link-danger"
-												data-app-mach-name={data.machineName}
-												onclick={removeDevice}>
+													class="link-danger"
+													data-app-mach-name={data.machineName}
+													onclick={removeDevice}
+												>
 													Remove device
 												</DropdownItem>
 											</DropdownMenu>
