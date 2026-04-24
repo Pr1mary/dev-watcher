@@ -1,7 +1,6 @@
 <script lang="ts">
 	import {
 		Badge,
-		Button,
 		Card,
 		CardBody,
 		CardFooter,
@@ -17,12 +16,8 @@
 	} from '@sveltestrap/sveltestrap';
 	import { pageStatus } from '../helper/shared_state_helper.svelte';
 	import { delDeviceProcess, getDataProcess, type DeviceData } from './page_logic';
-	import { Chart, type ChartItem } from 'chart.js/auto';
-	import { createBarChart } from '../helper/chart_helper';
-	import { browser } from '$app/environment';
 
 	let deviceList: DeviceData[] = $state([]);
-	let tooltipRefs: unknown[] = $state([]);
 
 	const badgeMouseEvent = (event: Event) => {
 		const injectClass = 'fs-5';
@@ -63,7 +58,7 @@
 					deviceList = deviceDataList;
 					pageStatus.waitFetch = false;
 				})
-				.catch((error) => {
+				.catch(() => {
 					deviceList = [];
 					pageStatus.waitFetch = false;
 				});
@@ -98,7 +93,7 @@
 	{:else if pageStatus.isLogin}
 		<Container>
 			<Row>
-				{#each deviceList as data, dev_id}
+				{#each deviceList as data (data.machineName)}
 					<div class="col-12 col-xl-6">
 						<Card body class="m-3 shadow">
 							<CardTitle>
@@ -110,8 +105,8 @@
 											<Badge class="text-bg-success">Online</Badge>
 										{/if}
 									</div>
-									<div class="p-2 align-self-center">
-										<strong>{data.displayName}</strong>
+									<div class="p-2 align-self-center text-truncate">
+										<strong>{data.machineName}</strong>
 									</div>
 									<div class="ms-auto p-2 align-self-center">
 										<Dropdown>
@@ -143,10 +138,10 @@
 										<div class="col-12 col-md-6 text-md-end">
 											Uptime last {data.daysRange} days<br />
 											<div class="user-select-none">
-												{#each data.uptimeDateList as downCount, idx}
+												{#each data.uptimeDateList as downCount (downCount.id)}
 													<span>
 														<span
-															id={`badge-${dev_id}-${idx}`}
+															id={`badge-${data.machineName}-${downCount.id}`}
 															role="button"
 															tabindex="0"
 															onmouseenter={badgeMouseEvent}
@@ -163,7 +158,7 @@
 															{/if}
 														</span>
 
-														<Tooltip target={`badge-${dev_id}-${idx}`} placement="bottom">
+														<Tooltip target={`badge-${data.machineName}-${downCount.id}`} placement="bottom">
 															<div><strong>{downCount.timestamp.toDateString()}</strong></div>
 															<div>
 																{#if downCount.count == -2}
