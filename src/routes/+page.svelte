@@ -12,13 +12,15 @@
 		DropdownToggle,
 		Icon,
 		Row,
+
 		Tooltip
+
 	} from '@sveltestrap/sveltestrap';
 	import { pageStatus } from '../helper/shared_state_helper.svelte';
 	import { delDeviceProcess, getDataProcess, type DeviceData } from './page_logic';
 
 	let deviceList: DeviceData[] = $state([]);
-
+	
 	const badgeMouseEvent = (event: Event) => {
 		const injectClass = 'fs-5';
 		if (event.type === 'mouseenter' && event.currentTarget) {
@@ -139,40 +141,38 @@
 											Uptime last {data.daysRange} days<br />
 											<div class="user-select-none">
 												{#each data.uptimeDateList as downCount (downCount.id)}
-													<span>
-														<span
-															id={`badge-${data.machineName}-${downCount.id}`}
-															role="button"
-															tabindex="0"
-															onmouseenter={badgeMouseEvent}
-															onmouseleave={badgeMouseEvent}
-														>
-															{#if downCount.count == -2}
-																<Badge class="text-bg-danger">X</Badge>
-															{:else if downCount.count == -1}
-																<Badge class="text-bg-secondary">?</Badge>
-															{:else if downCount.count == 0}
-																<Badge class="text-bg-success">0</Badge>
-															{:else}
-																<Badge class="text-bg-warning">{downCount.count}</Badge>
-															{/if}
-														</span>
-
-														<Tooltip target={`badge-${data.machineName}-${downCount.id}`} placement="bottom">
-															<div><strong>{downCount.timestamp.toDateString()}</strong></div>
-															<div>
-																{#if downCount.count == -2}
-																	<strong>System down detected</strong>
-																{:else if downCount.count == -1}
-																	No history on this day
-																{:else if downCount.count == 0}
-																	System up without downtime
-																{:else}
-																	System up with total downtime: <strong>{downCount.count}</strong>
-																{/if}
-															</div>
-														</Tooltip>
+													<span
+														id={`badge-${downCount.id}`}
+														role="button"
+														tabindex="0"
+														onmouseenter={badgeMouseEvent}
+														onmouseleave={badgeMouseEvent}
+													>
+														{#if downCount.count == -2}
+															<Badge class="text-bg-danger">X</Badge>
+														{:else if downCount.count == -1}
+															<Badge class="text-bg-secondary">?</Badge>
+														{:else if downCount.count == 0}
+															<Badge class="text-bg-success">0</Badge>
+														{:else}
+															<Badge class="text-bg-warning">{downCount.count}</Badge>
+														{/if}
 													</span>
+
+													<Tooltip target={`badge-${downCount.id}`} placement="bottom">
+														<div><strong>{downCount.timestamp.toDateString()}</strong></div>
+														<div>
+															{#if downCount.count == -2}
+																<strong>System down detected</strong>
+															{:else if downCount.count == -1}
+																No history on this day
+															{:else if downCount.count == 0}
+																System up without downtime
+															{:else}
+																System up with total downtime: <strong>{downCount.count}</strong>
+															{/if}
+														</div>
+													</Tooltip>
 												{/each}
 											</div>
 										</div>
