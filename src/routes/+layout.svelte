@@ -23,6 +23,8 @@
 		logoutRequest
 	} from './layout_logic';
 
+	import { online } from '$lib/stores/network';
+
 	let { children } = $props();
 
 	const SettingsMenuEnum = {
@@ -182,13 +184,22 @@
 	<Container class="d-flex justify-content-between">
 		<h2><Icon name="fire" /><strong>Flame</strong>Tower</h2>
 
-		<Button
-			disabled={!(authCheckDone && pageStatus.isLogin)}
-			onclick={() => toggleShowSettings()}
-			aria-label="settings"
-		>
-			<Icon name="gear-fill" />
-		</Button>
+		{#if $online}
+			<Button
+				disabled={!(authCheckDone && pageStatus.isLogin)}
+				onclick={() => toggleShowSettings()}
+				aria-label="settings"
+			>
+				<Icon name="gear-fill" />
+			</Button>
+		{:else}
+			<Button
+				disabled={true}
+				aria-label="settings"
+			>
+				<Icon name="gear-fill" />
+			</Button>
+		{/if}
 	</Container>
 </Navbar>
 

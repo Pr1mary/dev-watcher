@@ -19,6 +19,8 @@
 	import { pageStatus } from '../helper/shared_state_helper.svelte';
 	import { delDeviceProcess, getDataProcess, type DeviceData } from './page_logic';
 
+	import { online } from '$lib/stores/network';
+
 	let deviceList: DeviceData[] = $state([]);
 	
 	const badgeMouseEvent = (event: Event) => {
@@ -75,7 +77,13 @@
 </script>
 
 <Container>
-	{#if pageStatus.waitFetch}
+	{#if $online === false}
+		<div class="d-flex">
+			<h3 class="position-absolute top-50 start-50 translate-middle">
+				<Icon name="wifi-off" /> No Internet
+			</h3>
+		</div>
+	{:else if pageStatus.waitFetch}
 		<div>
 			<Card body class="m-3 shadow">
 				<CardTitle class="placeholder-glow">
